@@ -1,15 +1,80 @@
 const User = require('../models/user');
+const pool = require("../db");
 
-// Get all users
-const getUsers = async (req, res) => {
+const createUser = async (req, res) => {
+    const { name } = req.body;
+
+    if (!name) {
+        return res.status(400).json({ message: "Name is required" });
+    }
+
     try {
-        const users = await User.find();
-        res.json(users);
+        const result = await pool.query(
+            "INSERT INTO users (name) VALUES ($1) RETURNING *",
+            [name]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};  
+// GET user by ID
+const getUserById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query(
+            "SELECT * FROM users WHERE id = $1",
+            [id]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(result.rows[0]);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
 
+
+module.exports = {
+    // getUsers,
+    getUserById,
+    createUser,
+};
+
+// const getUserById =  async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.id);
+//         if (!user) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+//         res.status(200).json(user);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// }
+// Get all users
+// const getUsers = async (req, res) => {
+//     try {
+//         const users = await User.find();
+//         res.json(users);
+//     } catch (error) {
+//         res.status(500).json({ message: error.message });
+//     }
+// };
+// Create a new user
+// const createUser = async (req, res) => {
+//     try {
+//         const newUser = new User({ name: req.body.name });
+//         const savedUser = await newUser.save();
+//         res.status(201).json(savedUser);
+//     } catch (error) {
+//         res.status(400).json({ message: error.message });
+//     }
+// };
 // // Get user by id
 // app.get('/users/:id', (req, res) => {
 //     try{
@@ -20,36 +85,6 @@ const getUsers = async (req, res) => {
 //         res.status(404).json({ message: error.message });
 //     }
 // });
-
-const getUserById =  async (req, res) => {
-    try {
-        const user = await User.findById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-}
-
-// Create a new user
-const createUser = async (req, res) => {
-    try {
-        const newUser = new User({ name: req.body.name });
-        const savedUser = await newUser.save();
-        res.status(201).json(savedUser);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-};
-
-module.exports = {
-    getUsers,
-    getUserById,
-    createUser,
-};
-
 // // Update user via id
 // app.put('/users/:id', (req, res) => {
 //     const users = [
