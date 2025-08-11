@@ -1,4 +1,4 @@
-const User = require('../models/user');
+// const User = require('../models/user');
 const pool = require("../db");
 
 const createUser = async (req, res) => {
@@ -37,7 +37,6 @@ const getUserById = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
 
 module.exports = {
     // getUsers,
