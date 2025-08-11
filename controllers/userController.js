@@ -21,9 +21,21 @@ const getUsers = async (req, res) => {
 //     }
 // });
 
+const getUserById =  async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 // Create a new user
 const createUser = async (req, res) => {
-    try{
+    try {
         const newUser = new User({ name: req.body.name });
         const savedUser = await newUser.save();
         res.status(201).json(savedUser);
@@ -34,6 +46,7 @@ const createUser = async (req, res) => {
 
 module.exports = {
     getUsers,
+    getUserById,
     createUser,
 };
 
