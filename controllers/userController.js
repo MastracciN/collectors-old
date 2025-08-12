@@ -1,47 +1,31 @@
-// const User = require('../models/user');
-const pool = require("../db");
+const userModel = require("../models/user");
 
-const createUser = async (req, res) => {
+async function createUser(req, res) {
     const { name } = req.body;
-
     if (!name) {
         return res.status(400).json({ message: "Name is required" });
     }
-
     try {
-        const result = await pool.query(
-            "INSERT INTO users (name) VALUES ($1) RETURNING *",
-            [name]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        const user = await userModel.createUser(name);
+        res.status(201).json(user);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-};  
-// GET user by ID
-const getUserById = async (req, res) => {
-    const { id } = req.params;
+}
 
+async function getUserById(req, res) {
     try {
-        const result = await pool.query(
-            "SELECT * FROM users WHERE id = $1",
-            [id]
-        );
-
-        if (result.rows.length === 0) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        res.status(200).json(result.rows[0]);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+        const user = await userModel.getUserById(req.params.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
-};
+}
 
 module.exports = {
-    // getUsers,
-    getUserById,
     createUser,
+    getUserById
 };
 
 // const getUserById =  async (req, res) => {
