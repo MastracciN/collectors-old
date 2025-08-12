@@ -5,7 +5,8 @@ async function createUser(name) {
         `INSERT INTO users (name) VALUES ($1) RETURNING id, name`,
         [name]
     );
-    return results.row[0];
+    console.log(result);
+    return result.rows[0];
 }
 
 async function getUserById(id) {
@@ -13,7 +14,7 @@ async function getUserById(id) {
         `SELECT id, name FROM users WHERE id = $1`,
         [id]
     );
-    return result.row[0];
+    return result.rows[0];
 }
 
 async function getUsers(){
